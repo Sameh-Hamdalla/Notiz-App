@@ -1,4 +1,5 @@
 from sqlalchemy import create_engine, Column, Integer, String
+
 """
 Imports aus SQLAlchemy für die Datenbankarbeit
 create_engine:
@@ -11,6 +12,7 @@ String:
     - Spaltentyp für Texte   - Beispiel: "Hallo", "Notiz"
 """
 from sqlalchemy.orm import declarative_base
+
 """
 declarative_base:
     - Erzeugt eine "Basisklasse" für alle Datenbankmodelle.
@@ -23,6 +25,7 @@ declarative_base:
             id = Column(Integer, primary_key=True)
 """
 from sqlalchemy.orm import sessionmaker
+
 """
 sessionmaker:
     - Erzeugt eine Fabrikfunktion (Session-Klasse),
@@ -38,8 +41,8 @@ sessionmaker:
 """
 
 DATABASE_URL = "sqlite:///./notes.db"
-#sqlite://=> das sagt Wir benutzen den SQLite Dialekt, das dritte / =>Pfadangabe für eine lokale Datei
-engine = create_engine(DATABASE_URL, connect_args={'check_same_thread': False})
+# sqlite://=> das sagt Wir benutzen den SQLite Dialekt, das dritte / =>Pfadangabe für eine lokale Datei
+engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 """
 engine: Verbindung zur Datenbank, kümmert sich um die Kommunikation zwischen SQLAlchemy und SQLite
         connect_args={"check_same_thread": False} ist bei SQLite nötig,
@@ -60,16 +63,22 @@ Base:
     - alle Tabellen-Klassen erben von dieser Base
 """
 
+
 class Note(Base):
     __tablename__ = "notes"
-    id = Column(Integer, primary_key=True)
-    text = Column(String)
+    id = Column(Integer, primary_key=True, index=True)
+    text = Column(String, nullable=False)  # 🟢 Text-Spalte für den Notizinhalt
+    date = Column(String, nullable=True)  # 🟢 neues Feld für Datum
+
+
 """
 Note (Model):
     - Repräsentiert die Tabelle "notes" in der Datenbank
     - id:    Ganzzahl, Primärschlüssel (eindeutig)
     - text:  Textfeld für die eigentliche Notiz
+    - date:  Datum/Uhrzeit als String (optional)
 """
+
 Base.metadata.create_all(engine)
 """
 Base.metadata.create_all(bind=engine):
