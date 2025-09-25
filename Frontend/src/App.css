@@ -1,1 +1,113 @@
+/* App.css */
 
+/* 🌍 Ganze Seite */
+body {
+  font-family: Arial, sans-serif; /* Schriftart: Arial, falls nicht → Standardschrift */
+  background-color: #f4f4f9;      /* hellgrauer Hintergrund */
+  margin: 0;                      /* Abstand außen (standardmäßig 8px) entfernen */
+  padding: 20px;                  /* Innenabstand (Platz zum Rand) */
+}
+
+/* 📦 Der Hauptcontainer deiner App */
+div {
+  max-width: 600px;                           /* maximale Breite für die App */
+  margin: 0 auto;                             /* zentriert (auto links/rechts) */
+  background: #fff;                           /* weißer Hintergrund */
+  padding: 20px;                              /* Innenabstand */
+  border-radius: 8px;                         /* abgerundete Ecken */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);   /* leichter Schatten */
+}
+
+/* 🏷️ Überschrift */
+h1 {
+  text-align: center;   /* zentriert den Text */
+  color: #333;          /* dunkelgrau (nicht ganz schwarz) */
+  margin-bottom: 20px;  /* Abstand nach unten */
+}
+
+/* ✍ Eingabefelder */
+input[type="text"] {
+  padding: 10px;            /* Platz innen */
+  margin-right: 8px;        /* kleiner Abstand rechts (zum Button) */
+  margin-bottom: 10px;      /* Abstand nach unten */
+  border: 1px solid #ccc;   /* dünner grauer Rahmen */
+  border-radius: 6px;       /* abgerundete Ecken */
+  width: 70%;               /* Eingabe-Feld nimmt 70% Breite ein */
+}
+
+/* 🔘 Standard-Button */
+button {
+  padding: 8px 12px;               /* Innenabstand (oben/unten 8px, rechts/links 12px) */
+  margin: 4px;                     /* Abstand um den Button */
+  background-color: #4CAF50;       /* grüner Hintergrund */
+  color: white;                    /* weiße Schrift */
+  border: none;                    /* kein Standard-Rand */
+  border-radius: 6px;              /* abgerundete Ecken */
+  cursor: pointer;                 /* Mauszeiger = Hand */
+  transition: background 0.3s ease;/* sanfte Farbänderung beim Hover */
+}
+
+/* 🔘 Hover-Effekt für Buttons */
+button:hover {
+  background-color: #45a049; /* dunkleres Grün beim Darüberfahren */
+}
+
+/* 📋 Liste (ul) */
+ul {
+  list-style-type: none; /* entfernt die Punkte der Liste */
+  padding: 0;            /* kein Innenabstand */
+}
+
+/* 📝 Einzelne Notiz (li veraltet → jetzt .note-item nutzen) */
+li {
+  margin: 8px 0;
+  padding: 10px;
+}
+
+/* 📝 Einzelne Notiz → moderner Container */
+.note-item {
+  display: flex;                  /* Text und Buttons in einer Reihe */
+  justify-content: space-between; /* Text links, Buttons rechts */
+  align-items: center;            /* vertikal mittig */
+  padding: 12px 16px;             /* Innenabstand */
+  border: 1px solid #ddd;         /* dünner grauer Rahmen */
+  border-radius: 8px;             /* abgerundete Ecken */
+  margin-bottom: 12px;            /* Abstand zwischen Notizen */
+  background-color: #fff;         /* weißer Hintergrund */
+}
+
+/* 📝 Text einer Notiz */
+.note-text {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+/* 🔲 Container für die Buttons (Bearbeiten / Löschen) */
+.actions {
+  display: flex;   /* Buttons nebeneinander */
+  gap: 10px;       /* Abstand zwischen Buttons */
+  background: none;  /* keinen extra Hintergrund */
+  margin: 0;         /* keine Verschiebung */
+  padding: 0;        /* kein zusätzlicher Abstand */
+  box-shadow: none;  /* keine Box außenrum */
+}
+
+/* 🟢 Button "Bearbeiten" */
+button.edit {
+  background-color: #4caf50; /* grün */
+}
+
+/* 🔴 Button "Löschen" */
+button.delete {
+  background-color: #f44336; /* rot */
+}
+
+/* 🔴 Hover-Effekt für "Löschen" */
+button.delete:hover {
+  background-color: #d32f2f; /* dunkleres Rot beim Hover */
+}
+
+/* 🟠 Button "Alle löschen" */
+button.clear-all {
+  background-color: orange;
+}

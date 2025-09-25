@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import "./App.css";
+
 
 // React-Hook "useState" importieren → brauchen wir, um State (Zustand) zu speichern
 
@@ -145,20 +147,20 @@ function App() {
         // Hinweis: wenn Liste leer oder keine Notiz zur Suche passt
       ) : (
         <div>
-          <ul>
-            {filteredNotes.map((note) => (
-              <li key={note.id}>
-                {note.text}
-                {/* zeigt Text der Notiz */}
-                <button onClick={() => handleEdit(note)}>Bearbeiten</button>
-                {/* setzt Input-Feld auf diese Notiz */}
-                <button onClick={() => handleDelete(note.id)}>Löschen</button>
-                {/* löscht diese Notiz */}
-              </li>
-            ))}
-          </ul>
+            <ul>
+              {filteredNotes.map((note) => (
+                <li key={note.id} className="note-item">
+                  <span className="note-text">{note.text}</span>
+                  <div className="actions">
+                    <button className="edit" onClick={() => handleEdit(note)}>Bearbeiten</button>
+                    <button className="delete" onClick={() => handleDelete(note.id!)}>Löschen</button>
+                  </div>
+                </li>
+              ))}
+            </ul>
 
-          <button onClick={handleClearAll}>Alle löschen</button>
+          {/* 🟠 Button jetzt mit eigener Klasse "clear" */}
+          <button className="clear-all" onClick={handleClearAll}>Alle löschen</button>
           {/* Button: leert die gesamte Liste */}
         </div>
       )}
@@ -167,6 +169,7 @@ function App() {
 }
 
 export default App;
+
 
 
 // macht die Komponente App von außen nutzbar
