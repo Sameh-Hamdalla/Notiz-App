@@ -111,3 +111,10 @@ button.delete:hover {
 button.clear-all {
   background-color: orange;
 }
+
+.note-date {
+  display: block;       /* sorgt dafür, dass es unter dem Text erscheint */
+  font-size: 0.9rem;    /* etwas kleiner als normaler Text */
+  color: gray;          /* graue Schrift */
+  margin-top: 4px;      /* kleiner Abstand nach oben */
+}

@@ -191,7 +191,9 @@ function handleSave() {
                 <li key={note.id} className="note-item">
                   <span className="note-text">{note.text}</span>
                   {/* 🟢 Neues Datum-Feld anzeigen */}
-                  <span className="note-date">{note.date}</span>
+                  <span className="note-date">
+                  {new Date(note.date).toLocaleString("de-DE")}
+                  </span>
                   <div className="actions">
                     <button className="edit" onClick={() => handleEdit(note)}>Bearbeiten</button>
                     <button className="delete" onClick={() => handleDelete(note.id!)}>Löschen</button>
