@@ -1,13 +1,14 @@
+# routes_db.py
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import (
     BaseModel,
-)  ## BaseModel = Datenmodell für Requests (Eingaben im Body)
-
-from routes import router
-
+)  # BaseModel = Datenmodell für Requests (Eingaben im Body)
 from sqlalchemy.orm import Session
 from database import SessionLocal, Note
 from datetime import datetime  # 🟢 neu: für aktuelles Datum
+
+# 🟢 Eigener Router für DB-Routen
+router = APIRouter()
 
 
 class NoteUpdate(BaseModel):  # Schema für Update-Requests
@@ -70,11 +71,11 @@ class NoteCreate(BaseModel):  # Definiert das Schema für neue Notizen
     # date brauchen wir hier NICHT im Request, das setzt das Backend automatisch
 
 
-# Create
+# 🟢 Create
 @router.post("/notes")  # Definiert die Route POST /notes → neue Notiz anlegen
-def create_note_db(
-    note: NoteCreate, db: Session = Depends(get_db)
-):  # Funktion, erwartet ein NoteCreate-Objekt und eine DB-Session
+def create_note_db(note: NoteCreate, db: Session = Depends(get_db)):
+    if not note.text.strip():
+        raise HTTPException(status_code=400, detail="Text darf nicht leer sein")
     new_note = Note(
         text=note.text,
         date=datetime.now().strftime(
@@ -95,24 +96,24 @@ def create_note_db(
     }  # 🟢 gibt jetzt auch das Datum zurück
 
 
-# Read all
+# 🟢 Read all
 @router.get("/notes")  # Definiert die Route GET /notes → alle Notizen abrufen
-def get_notes_db(db: Session = Depends(get_db)):  # Funktion: erwartet eine DB-Session
-    notes = db.query(Note).all()  # Holt alle Notizen aus der Tabelle "notes"
+def get_notes_db(db: Session = Depends(get_db)):
+    notes = (
+        db.query(Note).order_by(Note.date.desc()).all()
+    )  # Holt alle Notizen sortiert nach Datum
     return [
         {"id": n.id, "text": n.text, "date": n.date} for n in notes
     ]  # 🟢 gibt auch Datum zurück
 
 
-# Read one
+# 🟢 Read one
 @router.get("/notes/{note_id}")  # Definiert die Route GET /notes/{id}
-def get_note_db(
-    note_id: int, db: Session = Depends(get_db)
-):  # Funktion: erwartet eine ID + DB-Session
+def get_note_db(note_id: int, db: Session = Depends(get_db)):
     note = (
         db.query(Note).filter(Note.id == note_id).first()
     )  # Holt die erste Notiz, die zur ID passt
-    if note is None:  # Falls keine Notiz mit dieser ID existiert
+    if note is None:
         raise HTTPException(
             status_code=404, detail="Notiz nicht gefunden"
         )  # Fehler zurückgeben
@@ -123,23 +124,19 @@ def get_note_db(
     }  # 🟢 gibt auch Datum zurück
 
 
-# Update
+# 🟢 Update
 @router.put("/notes/{note_id}")  # Definiert die Route PUT /notes/{id}
 def update_note_db(
-    note_id: int,  # note_id: Die ID der Notiz, die wir ändern wollen (kommt aus der URL)
-    updated_note: NoteUpdate,  # updated_note: Das Pydantic-Modell mit dem neuen Text (kommt aus dem Request-Body)
-    db: Session = Depends(
-        get_db
-    ),  # db: Die Datenbank-Session, die FastAPI automatisch mit get_db() erstellt
+    note_id: int, updated_note: NoteUpdate, db: Session = Depends(get_db)
 ):
-    note = db.query(Note).filter(Note.id == note_id).first()  # Notiz aus DB holen
-    if note is None:  # Falls nicht gefunden
+    note = db.query(Note).filter(Note.id == note_id).first()
+    if note is None:
         raise HTTPException(status_code=404, detail="Notiz nicht gefunden")
 
-    note.text = updated_note.text  # Text der Notiz ändern
+    note.text = updated_note.text
     note.date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # 🟢 Datum aktualisieren
-    db.commit()  # Änderung speichern
-    db.refresh(note)  # Neu laden, um aktualisierte Werte zu bekommen
+    db.commit()
+    db.refresh(note)
 
     return {
         "id": note.id,
@@ -148,16 +145,12 @@ def update_note_db(
     }  # 🟢 Geänderte Notiz zurückgeben
 
 
-# Delete
+# 🟢 Delete
 @router.delete("/notes/{note_id}")  # Route: DELETE /notes/{id}
 def delete_note_db(note_id: int, db: Session = Depends(get_db)):
-    note = (
-        db.query(Note).filter(Note.id == note_id).first()
-    )  # Notiz mit passender ID holen
-    if note is None:  # Wenn keine Notiz gefunden wurde
-        raise HTTPException(
-            status_code=404, detail="Notiz nicht gefunden"
-        )  # Fehler zurückgeben
-    db.delete(note)  # Notiz zum Löschen markieren
-    db.commit()  # Änderungen in der DB speichern
+    note = db.query(Note).filter(Note.id == note_id).first()
+    if note is None:
+        raise HTTPException(status_code=404, detail="Notiz nicht gefunden")
+    db.delete(note)
+    db.commit()
     return {"message": f"Notiz mit ID {note.id} wurde gelöscht"}  # Bestätigung als JSON

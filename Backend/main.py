@@ -1,11 +1,10 @@
 # main.py
-
 from fastapi import FastAPI
 from config import setup_cors
 from routes import (
     router as memory_router,
-)  # Router für die "Demo-Version" (In-Memory Notizen)
-from routes_db import router as db_router  # Router für die "echte DB-Version"
+)  # Router für die Demo-Version (In-Memory Notizen)
+from routes_db import router as db_router  # Router für die echte DB-Version
 
 # App erstellen
 app = FastAPI(
@@ -14,16 +13,14 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# 🟢 CORS Setup (wichtig, damit das Frontend zugreifen darf)
+# 🟢 CORS Setup (Frontend darf zugreifen)
 setup_cors(app)
 
 # 🟢 Routen einbinden
 # → Beide Router bleiben aktiv, so kannst du wählen:
 #    - /memory/... = flüchtige Notizen (werden beim Neustart gelöscht)
 #    - /db/...     = dauerhafte Notizen in SQLite-Datenbank
-
 app.include_router(memory_router, prefix="/memory", tags=["Memory Notes"])
-
 app.include_router(db_router, prefix="/db", tags=["DB Notes"])
 
 

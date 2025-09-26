@@ -6,9 +6,10 @@ import "./App.css";
 
 type Note = {
   id: number,       // id kommt jetzt sicher von der DB
-  text: string
+  text: string,     // Text der Notiz
+  date: string      // 🟢 Datum kommt vom Backend
 }
-//Wir legen fest, wie eine Notiz aussieht: sie hat Text und ID (aus DB).
+//Wir legen fest, wie eine Notiz aussieht: sie hat Text, ID und Datum (aus DB).
 
 function App() {
   const [text, setText] = useState(""); 
@@ -45,26 +46,45 @@ function App() {
     note.text.toLowerCase().includes(searchText.toLowerCase())
   )
 
-  // 🟢 Neue Notiz anlegen
-  function handleAdd() {
-    const newNote = {
-      text: text // Inhalt aus dem Eingabefeld
-    };
+// 🟢 Neue Notiz anlegen
+function handleAdd() {
+  const newNote = {
+    text: text // Inhalt aus dem Eingabefeld
+  };
 
-    fetch("http://127.0.0.1:8000/db/notes", {
-      method: "POST",                          // POST = neue Daten anlegen
-      headers: {
-        "Content-Type": "application/json",    // sagt dem Backend: ich schicke JSON
-      },
-      body: JSON.stringify(newNote),           // Notiz in JSON umwandeln und senden
+  fetch("http://127.0.0.1:8000/db/notes", {
+    method: "POST",                          // POST = neue Daten anlegen
+    headers: {
+      "Content-Type": "application/json",    // sagt dem Backend: ich schicke JSON
+    },
+    body: JSON.stringify(newNote),           // Notiz in JSON umwandeln und senden
+  })
+    // Antwort vom Backend prüfen
+    .then(async (res) => {
+      // Prüfen: war die Antwort erfolgreich? (Status 200–299)
+      if (!res.ok) {
+        // Falls Fehler → Text vom Backend holen
+        const err = await res.json();
+
+        // Fehler dem Nutzer im Browser anzeigen
+        alert("Fehler: " + err.detail);
+
+        // Abbrechen und ins .catch(...) springen
+        throw new Error(err.detail);
+      }
+
+      // Wenn alles OK → Antwort weitergeben
+      return res.json();
     })
-      .then((res) => res.json())
-      .then(() => {
-        loadNotes();  // frisch vom Backend holen
-        setText("");  // Eingabefeld leeren
-      })
-      .catch((err) => console.error("Fehler beim Speichern:", err));
-  }
+    // Wenn es geklappt hat → neu laden + Eingabe leeren
+    .then(() => {
+      loadNotes();  // frisch vom Backend holen
+      setText("");  // Eingabefeld leeren
+    })
+    // Falls Fehler auftritt → in die Konsole schreiben
+    .catch((err) => console.error("Fehler beim Speichern:", err));
+}
+
 
   // 🟢 Notiz löschen
   function handleDelete(id: number) {
@@ -82,25 +102,44 @@ function App() {
   }
 
   // 🟢 Änderung speichern
-  function handleSave() {
-    if (editId !== null) {
-      const updatedNote = { text: text };
+// 🟢 Änderung speichern
+function handleSave() {
+  if (editId !== null) {
+    const updatedNote = { text: text };
 
-      fetch(`http://127.0.0.1:8000/db/notes/${editId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedNote),
+    fetch(`http://127.0.0.1:8000/db/notes/${editId}`, {
+      method: "PUT",                          // PUT = bestehende Notiz ändern
+      headers: {
+        "Content-Type": "application/json",   // wir schicken JSON
+      },
+      body: JSON.stringify(updatedNote),      // neuen Text als JSON senden
+    })
+      // Antwort vom Backend prüfen
+      .then(async (res) => {
+        if (!res.ok) {
+          // Falls Fehler → Nachricht vom Backend holen
+          const err = await res.json();
+
+          // Nutzer informieren
+          alert("Fehler: " + err.detail);
+
+          // Abbrechen und Fehler werfen
+          throw new Error(err.detail);
+        }
+
+        // Wenn alles OK → JSON zurückgeben
+        return res.json();
       })
-        .then(() => {
-          loadNotes();      // neu laden
-          setText("");      // Input-Feld leeren
-          setEditId(null);  // Bearbeitungsmodus beenden
-        })
-        .catch((err) => console.error("Fehler beim Aktualisieren:", err));
-    }
+      // Wenn es geklappt hat → Notizen neu laden
+      .then(() => {
+        loadNotes();      // frisch laden
+        setText("");      // Eingabefeld leeren
+        setEditId(null);  // Bearbeitungsmodus beenden
+      })
+      .catch((err) => console.error("Fehler beim Aktualisieren:", err));
   }
+}
+
 
   function handleClearAll() {
     // löscht alle Notizen (einzeln durchgehen)
@@ -151,6 +190,8 @@ function App() {
               {filteredNotes.map((note) => (
                 <li key={note.id} className="note-item">
                   <span className="note-text">{note.text}</span>
+                  {/* 🟢 Neues Datum-Feld anzeigen */}
+                  <span className="note-date">{note.date}</span>
                   <div className="actions">
                     <button className="edit" onClick={() => handleEdit(note)}>Bearbeiten</button>
                     <button className="delete" onClick={() => handleDelete(note.id!)}>Löschen</button>
@@ -169,6 +210,7 @@ function App() {
 }
 
 export default App;
+
 
 
 
